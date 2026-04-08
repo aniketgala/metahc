@@ -22,6 +22,14 @@ app = create_app(
     env_name="customer_support_env",
 )
 
+@app.get("/health")
+def health():
+    return {"status": "ok"}
+
+@app.get("/")
+def root():
+    return {"message": "Customer Support Env is running!"}
+
 def main():
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
