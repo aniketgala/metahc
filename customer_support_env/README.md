@@ -8,7 +8,7 @@ pinned: false
 ---
 
 # Customer Support OpenEnv Environment
-(v1.0.4 - HF port 7860 fix)
+(v1.0.5 - final port sync 7860)
 
 A production-grade reinforcement learning environment for simulating real-world customer support workflows.
 

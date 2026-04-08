@@ -32,7 +32,7 @@ client = OpenAI(
     api_key=HF_TOKEN
 )
 
-def is_port_open(host="localhost", port=8000):
+def is_port_open(host="localhost", port=7860):
     """Check if the environment server port is open."""
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         return s.connect_ex((host, port)) == 0
@@ -51,7 +51,7 @@ def start_server():
                          creationflags=subprocess.CREATE_NEW_PROCESS_GROUP if os.name == 'nt' else 0)
         
         # Wait for server to start
-        for _ in range(10):
+        for _ in range(15):
             if is_port_open():
                 print("--- Server started successfully. ---")
                 return
@@ -63,8 +63,8 @@ async def run_task(task_id: str):
     # Print [START]
     print(f"[START] task={task_id} env=customer_support_env model={MODEL_NAME}")
     
-    # Initialize environment client
-    env = await CustomerSupportEnv.from_docker_image(IMAGE_NAME, base_url="http://localhost:8000")
+    # Initialize environment client on the correct port
+    env = await CustomerSupportEnv.from_docker_image(IMAGE_NAME, base_url="http://localhost:7860")
     
     try:
         # ✅ FIX: Await env.reset() and then access .observation
