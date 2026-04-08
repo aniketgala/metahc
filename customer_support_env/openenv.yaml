@@ -1,0 +1,16 @@
+spec_version: 1
+name: customer_support_env
+type: space
+runtime: fastapi
+app: server.app:app
+port: 8000
+tasks:
+  - id: easy_refund
+    name: Easy Refund Request
+    description: A simple duplicate subscription refund request.
+  - id: medium_delayed_order
+    name: Medium Delayed Order
+    description: A delayed order requiring apology and partial refund.
+  - id: hard_technical_reasoning
+    name: Hard Technical Reasoning
+    description: A technical 403 error requiring troubleshooting steps.
