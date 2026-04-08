@@ -34,12 +34,12 @@ COPY . .
 # Final sync to install the project
 RUN uv sync --frozen --no-editable
 
-# Expose FastAPI port
-EXPOSE 8000
+# Expose the default HF Space port
+EXPOSE 7860
 
-# Simple health check
+# Simple health check using the HF default port
 HEALTHCHECK --interval=10s --timeout=5s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:8000/health || exit 1
+    CMD curl -f http://localhost:7860/health || exit 1
 
-# Start the server using uvicorn directly for speed
-CMD ["uvicorn", "server.app:app", "--host", "0.0.0.0", "--port", "8000"]
+# Start uvicorn directly on port 7860
+CMD ["uvicorn", "server.app:app", "--host", "0.0.0.0", "--port", "7860"]

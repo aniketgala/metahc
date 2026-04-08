@@ -3,7 +3,7 @@ name: customer_support_env
 type: space
 runtime: fastapi
 app: server.app:app
-port: 8000
+port: 7860
 entrypoint: server.app:main
 tasks:
   - id: easy_refund
