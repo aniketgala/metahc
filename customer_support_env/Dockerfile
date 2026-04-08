@@ -1,39 +1,45 @@
-# Use Python 3.11 slim as the base image
-FROM python:3.11-slim
+# Use Python 3.10 slim as the base image
+FROM python:3.10-slim
+
+# Set environment variables
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=off \
+    PIP_DISABLE_PIP_VERSION_CHECK=on \
+    PATH="/app/.venv/bin:$PATH" \
+    PYTHONPATH="/app"
 
 # Set working directory
 WORKDIR /app
 
-# Install system dependencies
+# Install only essential system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
-    git \
     && rm -rf /var/lib/apt/lists/*
 
-# Install uv for fast dependency management
+# Install uv for extremely fast dependency management
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh && \
-    mv /root/.local/bin/uv /usr/local/bin/uv && \
-    mv /root/.local/bin/uvx /usr/local/bin/uvx
+    mv /root/.local/bin/uv /usr/local/bin/uv
 
-# Copy the environment code
-COPY . /app/
+# Copy only the dependency files first to leverage Docker cache
+COPY pyproject.toml uv.lock ./
 
-# Set environment variables
-ENV PATH="/app/.venv/bin:$PATH"
-ENV PYTHONPATH="/app:$PYTHONPATH"
-ENV PYTHONUNBUFFERED=1
+# Install dependencies WITHOUT the project itself first
+# This layer will be cached unless pyproject.toml or uv.lock changes
+RUN uv sync --frozen --no-install-project --no-editable
 
-# Sync dependencies using uv
-# This will use the uv.lock file we just generated and included in the build context
+# Now copy the rest of the application code
+COPY . .
+
+# Final sync to install the project
 RUN uv sync --frozen --no-editable
 
-# Expose the FastAPI port
+# Expose FastAPI port
 EXPOSE 8000
 
-# Health check to ensure the space starts correctly
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+# Simple health check
+HEALTHCHECK --interval=10s --timeout=5s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:8000/health || exit 1
 
-# Run the FastAPI server directly
-# Using --host 0.0.0.0 and --port 8000 as required by HF Spaces
+# Start the server using uvicorn directly for speed
 CMD ["uvicorn", "server.app:app", "--host", "0.0.0.0", "--port", "8000"]
