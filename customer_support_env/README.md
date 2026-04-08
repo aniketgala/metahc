@@ -8,7 +8,7 @@ pinned: false
 ---
 
 # Customer Support OpenEnv Environment
-(v1.0.1)
+(v1.0.2 - deployment fix)
 
 A production-grade reinforcement learning environment for simulating real-world customer support workflows.
 
